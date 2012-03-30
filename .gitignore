@@ -1,0 +1,6 @@
+target/
+.settings/
+.project
+.cproject
+src/*.o
+src/*.so
