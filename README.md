@@ -1,28 +1,26 @@
 # k8055 for libusb-1.0
 
-This library acts as a driver for the Velleman K8055 USB Experiment Board for operating systems supporting libusb-1.0, such as Linux. While providing a high-
+This library acts as a driver for the Velleman K8055 USB Experiment Board (http://www.velleman.eu) for operating systems supporting libusb-1.0, such as Linux. While providing a high-
 level interface for the user, the library communicates with a k8055 board through libusb.
 
 ## Requirements
--libusb-1.0 (see src/Makefile to set include path)
--(doxygen for documentation generation)
+- libusb-1.0 (see src/Makefile to set include path)
+- (doxygen for documentation generation)
 
 ## Build
-Run ```make''' in the project root folder. Products are copied to `target' directory.
+Run ```make``` in the project root folder. Products are copied to `target' directory.
 
 ## Documentation
 See the comments in the source code for documentation about usage. Note: the API isn't the same as the one provided by Velleman in their DLL but enables the same features.
 
-Run ```make doc''' to generate doxygen documentation.
+Run ```make doc``` to generate doxygen documentation.
 
 ## Authors
 The library is written by Jakob Odersky. Nevertheless, it is based on the information provided by the following people who wrote the original version of `libk8055' (http://libk8055.sourceforge.net/):
 
--2005 by Sven Lindberg <k8055@k8055.mine.nu>
+- 2005 by Sven Lindberg <k8055@k8055.mine.nu>
 
--2007 by Pjetur G. Hjaltason <pjetur@pjetur.net>
- Commenting, general rearrangement of code, bugfixes,
- python interface with swig and simple k8055 python class
+- 2007 by Pjetur G. Hjaltason <pjetur@pjetur.net> Commenting, general rearrangement of code, bugfixes, python interface with swig and simple k8055 python class
 
 Thanks alot to you!
 
