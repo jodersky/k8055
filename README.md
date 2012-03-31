@@ -15,13 +15,26 @@ level interface for the user, the library communicates with a k8055 board throug
 ## Build
 Run ```make``` in the project root folder. Products are copied to `target' directory.
 
+### Udev Rules
+If your system uses udev, you will probably have to configure it to allow access the k8055 boards. The following instructions show how to configure udev (you will need root privileges).
+1. Copy the file `k8055.rules' into the udev rules directory, typically /etc/udev/rules.d
+   ```cp k8055.rules /etc/udev/rules.d/k8055.rules```
+2. Create a group named k8055.
+   ```groupadd k8055```
+3. Add to the group yourself and/or other users whom you wish to grant access to the boards.
+   ```usermod -a -G k8055 $(USER)```
+
+The previously described steps may be automated by running ```make install-rules``` to install just the rules or ```make install-permissions``` to also create the group and add the current user to it.
+To uninstall, run ```make uninstall-rules``` or ```make uninstall-permissions```.
+
+
 ## Documentation
 See the comments in the source code for documentation about usage. Note: the API isn't the same as the one provided by Velleman in their DLL.
 
 Run ```make doc``` to generate doxygen documentation.
 
 ## Authors
-The library is written by Jakob Odersky. Nevertheless, it is based on the information provided by the following people who wrote the original version of `libk8055' (http://libk8055.sourceforge.net):
+The library is written by Jakob Odersky. Nevertheless, it is based on the information provided by the following people who wrote the original version of `libk8055' (http://libk8055.sourceforge.net) :
 
 - 2005 by Sven Lindberg <k8055@k8055.mine.nu>
 

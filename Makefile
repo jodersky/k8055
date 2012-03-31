@@ -17,5 +17,18 @@ mkdirs:
 	mkdir -p target/lib
 	mkdir -p target/include
 
-doc:
+doc: mkdirs
 	doxygen Doxyfile
+
+#these commands must be run as root
+install-rules:
+	cp k8055.rules /etc/udev/rules.d/k8055.rules
+uninstall-rules:
+	rm /etc/udev/rules.d/k8055.rules
+install-permissions: install-rules
+	groupadd k8055
+	usermod -a -G k8055 $(USER)
+uninstall-permissions: uninstall-rules
+	groupdel k8055
+
+
