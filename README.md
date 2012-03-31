@@ -75,6 +75,5 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ## Tested
-Ubuntu 11.04, kernel 2.6.38-13-generic, x86_64, March 2012
-Ubuntu 11.10, kernel 3.0.0-16-generic, i686, March 2012
-March 2012
+- Ubuntu 11.04, kernel 2.6.38-13-generic, x86_64, March 2012
+- Ubuntu 11.10, kernel 3.0.0-16-generic, i686, March 2012
