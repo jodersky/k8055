@@ -17,11 +17,11 @@ Run ```make``` in the project root folder. Products are copied to `target' direc
 
 ### Udev Rules
 If your system uses udev, you will probably have to configure it to allow access the k8055 boards. The following instructions show how to configure udev (you will need root privileges).
-1. Copy the file `k8055.rules' into the udev rules directory, typically /etc/udev/rules.d
+1.  Copy the file `k8055.rules' into the udev rules directory, typically /etc/udev/rules.d
    ```cp k8055.rules /etc/udev/rules.d/k8055.rules```
-2. Create a group named k8055.
+2.  Create a group named k8055.
    ```groupadd k8055```
-3. Add to the group yourself and/or other users whom you wish to grant access to the boards.
+3.  Add to the group yourself and/or other users whom you wish to grant access to the boards.
    ```usermod -a -G k8055 $(USER)```
 
 The previously described steps may be automated by running ```make install-rules``` to install just the rules or ```make install-permissions``` to also create the group and add the current user to it.
