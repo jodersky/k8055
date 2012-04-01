@@ -285,7 +285,7 @@ static int writeData(int port) {
  * @return K8055_ERROR_INDEX if port is an invalid index
  * @return K8055_ERROR_CLOSED if the board associated to the given port is not open
  * @return K8055_ERROR_READ if another error occurred during the read process */
-static int readData(int port) {
+static int readData(int port, int cycles) {
     int readStatus = 0;
 
     if (port < 0 || K8055_MAX_DEVICES < port) {
@@ -302,7 +302,7 @@ static int readData(int port) {
 
     int transferred = 0;
     for(int i = 0; i < 3; ++i) {
-    	for(int j = 0; j < 2; ++j) { /* read twice to get fresh data, (i.e. circumvent some kind of buffer) */
+    	for(int j = 0; j < cycles; ++j) { /* read twice to get fresh data, (i.e. circumvent some kind of buffer) */
     		readStatus = libusb_interrupt_transfer(
     				device->deviceHandle,
     				USB_IN_EP,
@@ -416,8 +416,8 @@ int setDebounceTime(int port, int counter, int debounce) {
 	return writeData(port);
 }
 
-int getAll(int port, int *digitalBitmask, int *analog1, int *analog2, int *counter1, int *counter2) {
-	int r = readData(port);
+static int getAllCycle(int port, int *digitalBitmask, int *analog1, int *analog2, int *counter1, int *counter2, int cycles) {
+	int r = readData(port, cycles);
 	if (r != 0) return r;
 
 	struct K8055Device *device = &devices[port];
@@ -436,4 +436,12 @@ int getAll(int port, int *digitalBitmask, int *analog1, int *analog2, int *count
 	if (counter2 != NULL)
 		*counter2 = (int) device->dataIn[IN_COUNTER_2_OFFSET + 1] << 8 | device->dataIn[IN_COUNTER_2_OFFSET];
 	return 0;
+}
+
+int getAll(int port, int *digitalBitmask, int *analog1, int *analog2, int *counter1, int *counter2) {
+	return getAllCycle(port, digitalBitmask, analog1, analog2, counter1, counter2, 2);
+}
+
+int quickGetAll(int port, int *digitalBitmask, int *analog1, int *analog2, int *counter1, int *counter2) {
+	return getAllCycle(port, digitalBitmask, analog1, analog2, counter1, counter2, 1);
 }

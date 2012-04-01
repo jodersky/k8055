@@ -107,6 +107,7 @@ int resetCounter(int port, int counter);
 int setDebounceTime(int port, int counter, int debounce);
 
 /**Reads all current data of a given board into the passed parameters. NULL is a valid parameter.
+ * Data is read twice from the borad to circumvent some kind of buffer and get actual data.
  * @param port address of board
  * @param digitalBitmask bitmask value of digital inputs
  * @param analog1 value of first analog input
@@ -118,5 +119,19 @@ int setDebounceTime(int port, int counter, int debounce);
  * @return K8055_ERROR_CLOSED if the board associated to the given port is not open
  * @return K8055_ERROR_READ if another error occurred during the read process */
 int getAll(int port, int *digitalBitMask, int *analog1, int *analog2, int *counter1, int *counter2);
+
+/**Reads all current data of a given board into the passed parameters. NULL is a valid parameter.
+ * This function reads data once from the board and no guarantee of actuality is given.
+ * @param port address of board
+ * @param digitalBitmask bitmask value of digital inputs
+ * @param analog1 value of first analog input
+ * @param analog2 value of second analog input
+ * @param counter1 value of first counter
+ * @param counter2 value of second counter
+ * @return 0 on success
+ * @return K8055_ERROR_INDEX if port or counter are invalid indices
+ * @return K8055_ERROR_CLOSED if the board associated to the given port is not open
+ * @return K8055_ERROR_READ if another error occurred during the read process */
+int quickGetAll(int port, int *digitalBitMask, int *analog1, int *analog2, int *counter1, int *counter2);
 
 #endif /* K8055_H_ */
