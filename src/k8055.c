@@ -126,7 +126,7 @@
 #include "k8055.h"
 
 /** Represents a Vellemean K8055 USB board. */
-struct K8055Device {
+typedef struct K8055Device {
     
     /** Data last read from device, used by readData(). */
     unsigned char dataIn[PACKET_LENGTH];
@@ -136,19 +136,19 @@ struct K8055Device {
 
     /** Underlying libusb handle to device. NULL if the device is not open. */
     libusb_device_handle *deviceHandle;
-};
+} K8055Device;
 
 
 /* Global Variables
 * ================
-* Yes, unfortunately. However, as this is program is meant to a driver,
+* Yes, unfortunately. However, as this program is meant to be a driver,
 * access to these variables from the outside should not occur. */
 
 /** Libusb context. */
 static libusb_context* context = NULL;
 
 /** This array contains all K8055 devices, regardless of their connection status. The index corresponds to a device's port. */
-static struct K8055Device devices[K8055_MAX_DEVICES];
+static K8055Device devices[K8055_MAX_DEVICES];
 
 static int DEBUG = 0;
 
@@ -261,7 +261,7 @@ static int writeData(int port) {
     	return K8055_ERROR_CLOSED;
     }
 
-    struct K8055Device *device = &devices[port];
+    K8055Device *device = &devices[port];
 
     int transferred = 0;
     for(int i=0; i < 3; ++i) {
@@ -298,7 +298,7 @@ static int readData(int port, int cycles) {
         	return K8055_ERROR_CLOSED;
     }
 
-    struct K8055Device *device = &devices[port];
+    K8055Device *device = &devices[port];
 
     int transferred = 0;
     for(int i = 0; i < 3; ++i) {
@@ -338,14 +338,14 @@ static int intToDebounce(int x) {
 }
 
 int setAllDigital(int port, int bitmask) {
-	struct K8055Device *device = &devices[port];
+	K8055Device *device = &devices[port];
 	device->dataOut[OUT_DIGITAL_OFFSET] = bitmask;
 	device->dataOut[0] = CMD_SET_ANALOG_DIGITAL;
 	return writeData(port);
 }
 
 int setDigital(int port, int channel, int status) {
-	struct K8055Device *device = &devices[port];
+	K8055Device *device = &devices[port];
 
 	unsigned char data = device->dataOut[OUT_DIGITAL_OFFSET];
 	if (status == 0) /* off */
@@ -359,7 +359,7 @@ int setDigital(int port, int channel, int status) {
 }
 
 int setAllAnalog(int port, int analog1, int analog2) {
-	struct K8055Device *device = &devices[port];
+	K8055Device *device = &devices[port];
 	device->dataOut[OUT_ANALOG_1_OFFSET] = analog1;
 	device->dataOut[OUT_ANALOG_2_OFFSET] = analog2;
 	device->dataOut[0] = CMD_SET_ANALOG_DIGITAL;
@@ -367,7 +367,7 @@ int setAllAnalog(int port, int analog1, int analog2) {
 }
 
 int setAnalog(int port, int channel, int value) {
-	struct K8055Device *device = &devices[port];
+	K8055Device *device = &devices[port];
 
 	if (channel == 0) {
 		device->dataOut[OUT_ANALOG_1_OFFSET] = value;
@@ -383,7 +383,7 @@ int setAnalog(int port, int channel, int value) {
 }
 
 int resetCounter(int port, int counter) {
-	struct K8055Device *device = &devices[port];
+	K8055Device *device = &devices[port];
 
 	if (counter == 0) {
 		device->dataOut[OUT_COUNTER_1_OFFSET] = 0;
@@ -400,7 +400,7 @@ int resetCounter(int port, int counter) {
 }
 
 int setDebounceTime(int port, int counter, int debounce) {
-	struct K8055Device *device = &devices[port];
+	K8055Device *device = &devices[port];
 
 	if (counter == 0) {
 		device->dataOut[OUT_COUNTER_1_DEBOUNCE_OFFSET] = intToDebounce(debounce);
@@ -420,7 +420,7 @@ static int getAllCycle(int port, int *digitalBitmask, int *analog1, int *analog2
 	int r = readData(port, cycles);
 	if (r != 0) return r;
 
-	struct K8055Device *device = &devices[port];
+	K8055Device *device = &devices[port];
 
 	if (digitalBitmask != NULL)
 		*digitalBitmask = (
