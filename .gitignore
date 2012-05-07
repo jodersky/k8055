@@ -4,3 +4,4 @@ target/
 .cproject
 src/*.o
 src/*.so
+*~
