@@ -29,7 +29,7 @@ If your system uses udev, you will probably have to configure it to allow access
 
     ```usermod -a -G k8055 $(USER)```
 
-The previously described steps may be automated by running ```make install-rules``` to install just the rules or ```make install-permissions``` to also create the group and add the current user to it.
+The previously described steps may be automated by running ```make install-rules``` to install just the rules or ```make install-permissions users="<list of users>"``` to also create the group and add the given list of users to it.
 To uninstall, run ```make uninstall-rules``` or ```make uninstall-permissions```.
 
 
