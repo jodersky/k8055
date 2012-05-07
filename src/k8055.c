@@ -251,7 +251,7 @@ void closeDevice(int port) {
 static int writeData(int port) {
     int writeStatus = 0;
 
-    if (port < 0 || K8055_MAX_DEVICES < port) {
+    if (port < 0 || K8055_MAX_DEVICES <= port) {
     	printError("invalid port number, port p should be 0<=p<=3");
     	return K8055_ERROR_INDEX;
     }
@@ -288,7 +288,7 @@ static int writeData(int port) {
 static int readData(int port, int cycles) {
     int readStatus = 0;
 
-    if (port < 0 || K8055_MAX_DEVICES < port) {
+    if (port < 0 || K8055_MAX_DEVICES <= port) {
 		printError("invalid port number, port p should be 0<=p<=3");
 		return K8055_ERROR_INDEX;
 	}
