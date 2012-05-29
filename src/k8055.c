@@ -320,7 +320,7 @@ static int read_data(int port, int cycles) {
 	return 0;
 }
 
-static int intToDebounce(int x) {
+static int int_to_debounce(int x) {
 	int t = x;
 	/* the velleman k8055 use a exponetial formula to split up the
 	 DebounceTime 0-7450 over value 1-255. I've tested every value and
@@ -403,10 +403,10 @@ int k8055_set_debounce_time(int port, int counter, int debounce) {
 	k8055_device *device = &devices[port];
 
 	if (counter == 0) {
-		device->data_out[OUT_COUNTER_1_DEBOUNCE_OFFSET] = intToDebounce(debounce);
+		device->data_out[OUT_COUNTER_1_DEBOUNCE_OFFSET] = int_to_debounce(debounce);
 		device->data_out[0] = CMD_SET_DEBOUNCE_1;
 	} else if (counter == 1) {
-		device->data_out[OUT_COUNTER_2_DEBOUNCE_OFFSET] = intToDebounce(debounce);
+		device->data_out[OUT_COUNTER_2_DEBOUNCE_OFFSET] = int_to_debounce(debounce);
 		device->data_out[0] = CMD_SET_DEBOUNCE_2;
 	} else {
 		print_error("can't set debounce time for unknown counter");
@@ -416,14 +416,14 @@ int k8055_set_debounce_time(int port, int counter, int debounce) {
 	return write_data(port);
 }
 
-static int get_all_cycle(int port, int *digitalBitmask, int *analog1, int *analog2, int *counter1, int *counter2, int cycles) {
+static int get_all_cycle(int port, int *bitmask, int *analog1, int *analog2, int *counter1, int *counter2, int cycles) {
 	int r = read_data(port, cycles);
 	if (r != 0) return r;
 
 	k8055_device *device = &devices[port];
 
-	if (digitalBitmask != NULL)
-		*digitalBitmask = (
+	if (bitmask != NULL)
+		*bitmask = (
 				((device->data_in[IN_DIGITAL_OFFSET] >> 4) & 0x03) | /* Input 1 and 2 */
 				((device->data_in[IN_DIGITAL_OFFSET] << 2) & 0x04) | /* Input 3 */
 				((device->data_in[IN_DIGITAL_OFFSET] >> 3) & 0x18)); /* Input 4 and 5 */
@@ -438,10 +438,10 @@ static int get_all_cycle(int port, int *digitalBitmask, int *analog1, int *analo
 	return 0;
 }
 
-int k8055_get_all(int port, int *digitalBitmask, int *analog1, int *analog2, int *counter1, int *counter2) {
-	return get_all_cycle(port, digitalBitmask, analog1, analog2, counter1, counter2, 2);
+int k8055_get_all_input(int port, int *bitmask, int *analog1, int *analog2, int *counter1, int *counter2) {
+	return get_all_cycle(port, bitmask, analog1, analog2, counter1, counter2, 2);
 }
 
-int k8055_quick_get_all(int port, int *digitalBitmask, int *analog1, int *analog2, int *counter1, int *counter2) {
-	return getAllCycle(port, digitalBitmask, analog1, analog2, counter1, counter2, 1);
+int k8055_quick_get_all_input(int port, int *bitmask, int *analog1, int *analog2, int *counter1, int *counter2) {
+	return getAllCycle(port, bitmask, analog1, analog2, counter1, counter2, 1);
 }

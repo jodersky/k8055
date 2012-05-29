@@ -122,7 +122,7 @@ int k8055_set_debounce_time(int port, int counter, int debounce);
  * @return K8055_ERROR_INDEX if port or counter are invalid indices
  * @return K8055_ERROR_CLOSED if the board associated to the given port is not open
  * @return K8055_ERROR_READ if another error occurred during the read process */
-int k8055_get_all(int port, int *digitalBitMask, int *analog1, int *analog2, int *counter1, int *counter2);
+int k8055_get_all_input(int port, int *digitalBitmask, int *analog1, int *analog2, int *counter1, int *counter2);
 
 /**Reads all current data of a given board into the passed parameters. NULL is a valid parameter.
  * This function reads data once from the board and no guarantee of actuality is given.
@@ -136,7 +136,7 @@ int k8055_get_all(int port, int *digitalBitMask, int *analog1, int *analog2, int
  * @return K8055_ERROR_INDEX if port or counter are invalid indices
  * @return K8055_ERROR_CLOSED if the board associated to the given port is not open
  * @return K8055_ERROR_READ if another error occurred during the read process */
-int k8055_quick_get_all(int port, int *digitalBitMask, int *analog1, int *analog2, int *counter1, int *counter2);
+int k8055_quick_get_all_input(int port, int *digitalBitmask, int *analog1, int *analog2, int *counter1, int *counter2);
 
 #ifdef __cplusplus
 }
