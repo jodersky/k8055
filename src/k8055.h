@@ -33,7 +33,7 @@
 extern "C" {
 #endif
 
-enum ErrorCode {
+enum k8055_error_code {
 	K8055_SUCCESS = 0,
 	K8055_ERROR = -1, K8055_ERROR_INIT_LIBUSB = -2, /* error during libusb initialization */
 	K8055_ERROR_NO_DEVICES = -3, /* no usb devices found on host machine */
@@ -53,10 +53,10 @@ enum ErrorCode {
  * @return K8055_ERROR_NO_K8055 if no K8055 board is found at the given port
  * @return K8055_ERROR_ACCESS if permission is denied to access a usb port
  * @return K8055_ERROR_OPEN if another error occured preventing the board to be opened */
-int openDevice(int port);
+int k8055_open_device(int port);
 
 /** Closes a board at the given port. */
-void closeDevice(int port);
+void k8055_close_device(int port);
 
 /**Sets all digital ouputs according to the given bitmask.
  * @param port address of board
@@ -64,16 +64,16 @@ void closeDevice(int port);
  * @return K8055_ERROR_INDEX if port is an invalid index
  * @return K8055_ERROR_CLOSED if the board associated to the given port is not open
  * @return K8055_ERROR_WRITE if another error occurred during the write process */
-int setAllDigital(int port, int digitalBitMask);
+int k8055_set_all_digital(int port, int bitmask);
 
 /**Sets a digital output at given channel.
  * @param port address of board
  * @param channel channel of port
- * @param status output status: '1' for 'on', '0' for 'off'
+ * @param value output status: '1' for 'on', '0' for 'off'
  * @return K8055_ERROR_INDEX if port is an invalid index
  * @return K8055_ERROR_CLOSED if the board associated to the given port is not open
  * @return K8055_ERROR_WRITE if another error occurred during the write process */
-int setDigital(int port, int channel, int status);
+int k8055_set_digital(int port, int channel, int value);
 
 /**Sets the values of both analog outputs.
  * @param port address of board
@@ -82,7 +82,7 @@ int setDigital(int port, int channel, int status);
  * @return K8055_ERROR_INDEX if port is an invalid index
  * @return K8055_ERROR_CLOSED if the board associated to the given port is not open
  * @return K8055_ERROR_WRITE if another error occurred during the write process */
-int setAllAnalog(int port, int analog1, int analog2);
+int k8055_set_all_analog(int port, int analog1, int analog2);
 
 /**Sets the value for an analog output at a given channel.
  * @param port address of board
@@ -91,7 +91,7 @@ int setAllAnalog(int port, int analog1, int analog2);
  * @return K8055_ERROR_INDEX if port or channel are an invalid indices
  * @return K8055_ERROR_CLOSED if the board associated to the given port is not open
  * @return K8055_ERROR_WRITE if another error occurred during the write process */
-int setAnalog(int port, int channel, int value);
+int k8055_set_analog(int port, int channel, int value);
 
 /**Resets a hardware integrated counter of the Velleman K8055 board.
  * @param port address of board
@@ -99,7 +99,7 @@ int setAnalog(int port, int channel, int value);
  * @return K8055_ERROR_INDEX if port or counter are invalid indices
  * @return K8055_ERROR_CLOSED if the board associated to the given port is not open
  * @return K8055_ERROR_WRITE if another error occurred during the write process */
-int resetCounter(int port, int counter);
+int k8055_reset_counter(int port, int counter);
 
 /**Sets the debounce time of a hardware integrated counter of the Velleman K8055 board.
  * @param port address of board
@@ -108,7 +108,7 @@ int resetCounter(int port, int counter);
  * @return K8055_ERROR_INDEX if port or counter are invalid indices
  * @return K8055_ERROR_CLOSED if the board associated to the given port is not open
  * @return K8055_ERROR_WRITE if another error occurred during the write process*/
-int setDebounceTime(int port, int counter, int debounce);
+int k8055_set_debounce_time(int port, int counter, int debounce);
 
 /**Reads all current data of a given board into the passed parameters. NULL is a valid parameter.
  * Data is read twice from the borad to circumvent some kind of buffer and get actual data.
@@ -122,7 +122,7 @@ int setDebounceTime(int port, int counter, int debounce);
  * @return K8055_ERROR_INDEX if port or counter are invalid indices
  * @return K8055_ERROR_CLOSED if the board associated to the given port is not open
  * @return K8055_ERROR_READ if another error occurred during the read process */
-int getAll(int port, int *digitalBitMask, int *analog1, int *analog2, int *counter1, int *counter2);
+int k8055_get_all(int port, int *digitalBitMask, int *analog1, int *analog2, int *counter1, int *counter2);
 
 /**Reads all current data of a given board into the passed parameters. NULL is a valid parameter.
  * This function reads data once from the board and no guarantee of actuality is given.
@@ -136,7 +136,7 @@ int getAll(int port, int *digitalBitMask, int *analog1, int *analog2, int *count
  * @return K8055_ERROR_INDEX if port or counter are invalid indices
  * @return K8055_ERROR_CLOSED if the board associated to the given port is not open
  * @return K8055_ERROR_READ if another error occurred during the read process */
-int quickGetAll(int port, int *digitalBitMask, int *analog1, int *analog2, int *counter1, int *counter2);
+int k8055_quick_get_all(int port, int *digitalBitMask, int *analog1, int *analog2, int *counter1, int *counter2);
 
 #ifdef __cplusplus
 }
