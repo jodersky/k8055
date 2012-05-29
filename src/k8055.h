@@ -29,6 +29,10 @@
 #ifndef K8055_H_
 #define K8055_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum ErrorCode {
 	K8055_SUCCESS = 0,
 	K8055_ERROR = -1, K8055_ERROR_INIT_LIBUSB = -2, /* error during libusb initialization */
@@ -133,5 +137,9 @@ int getAll(int port, int *digitalBitMask, int *analog1, int *analog2, int *count
  * @return K8055_ERROR_CLOSED if the board associated to the given port is not open
  * @return K8055_ERROR_READ if another error occurred during the read process */
 int quickGetAll(int port, int *digitalBitMask, int *analog1, int *analog2, int *counter1, int *counter2);
+
+#ifdef __cplusplus
+}
+#endif 
 
 #endif /* K8055_H_ */
