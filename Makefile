@@ -25,7 +25,7 @@ doc: mkdirs
 #these commands must be run as root
 install-rules:
 	cp k8055.rules /etc/udev/rules.d/k8055.rules
-don't make shared libraries executable
+
 uninstall-rules:
 	rm /etc/udev/rules.d/k8055.rules
 
