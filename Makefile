@@ -1,5 +1,7 @@
+PREFIX = /usr/local
 
-all: compile copy
+
+local: compile copy
 
 compile:
 	make -C src
@@ -23,12 +25,26 @@ doc: mkdirs
 #these commands must be run as root
 install-rules:
 	cp k8055.rules /etc/udev/rules.d/k8055.rules
+don't make shared libraries executable
 uninstall-rules:
 	rm /etc/udev/rules.d/k8055.rules
+
 install-permissions: install-rules
 	groupadd -f k8055
-	$(foreach user, $(users), usermod -a -G k8055 $(user);)
+	$(foreach user, $(USERS), usermod -a -G k8055 $(user);)
+
 uninstall-permissions: uninstall-rules
 	groupdel k8055
 
+install: compile
+	cp src/*.so $(PREFIX)/lib
+	cp src/*.h $(PREFIX)/include
+
+uninstall:
+	rm $(PREFIX)/lib/libk8055.so
+	rm $(PREFIX)/include/k8055.h
+	
+install-all: install install-permissions
+
+uninstall-all: uninstall-permissions uninstall
 

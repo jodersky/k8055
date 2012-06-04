@@ -443,5 +443,5 @@ int k8055_get_all_input(int port, int *bitmask, int *analog1, int *analog2, int 
 }
 
 int k8055_quick_get_all_input(int port, int *bitmask, int *analog1, int *analog2, int *counter1, int *counter2) {
-	return getAllCycle(port, bitmask, analog1, analog2, counter1, counter2, 1);
+	return get_all_cycle(port, bitmask, analog1, analog2, counter1, counter2, 1);
 }
