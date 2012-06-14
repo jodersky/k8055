@@ -98,31 +98,36 @@
 #define USB_IN_EP 0x81 /* USB Input endpoint */
 #define USB_TIMEOUT 20 /* [ms] */
 
-#define IN_DIGITAL_OFFSET 0
-#define IN_ANALOG_1_OFFSET 2
-#define IN_ANALOG_2_OFFSET 3
-#define IN_COUNTER_1_OFFSET 4
-#define IN_COUNTER_2_OFFSET 6
+#define WRITE_TRIES 3 /* maximum number of write tries */
+#define READ_TRIES 3/* maximum number of read tries */
 
+#define IN_DIGITAL_OFFSET 0
+#define IN_ANALOG_0_OFFSET 2
+#define IN_ANALOG_1_OFFSET 3
+#define IN_COUNTER_0_OFFSET 4
+#define IN_COUNTER_1_OFFSET 6
+
+#define OUT_CMD_OFFEST 0
 #define OUT_DIGITAL_OFFSET 1
-#define OUT_ANALOG_1_OFFSET 2
-#define OUT_ANALOG_2_OFFSET 3
-#define OUT_COUNTER_1_OFFSET 4
-#define OUT_COUNTER_2_OFFSET 5
-#define OUT_COUNTER_1_DEBOUNCE_OFFSET 6
-#define OUT_COUNTER_2_DEBOUNCE_OFFSET 7
+#define OUT_ANALOG_0_OFFSET 2
+#define OUT_ANALOG_1_OFFSET 3
+#define OUT_COUNTER_0_OFFSET 4
+#define OUT_COUNTER_1_OFFSET 5
+#define OUT_COUNTER_0_DEBOUNCE_OFFSET 6
+#define OUT_COUNTER_1_DEBOUNCE_OFFSET 7
 
 #define CMD_RESET 0
 #define CMD_SET_DEBOUNCE_1 1
 #define CMD_SET_DEBOUNCE_2 2
-#define CMD_RESET_COUNTER_1 3
-#define CMD_RESET_COUNTER_2 4
+#define CMD_RESET_COUNTER_0 3
+#define CMD_RESET_COUNTER_1 4
 #define CMD_SET_ANALOG_DIGITAL 5
 
-#include <libusb.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <libusb.h>
 #include "k8055.h"
 
 /** Represents a Vellemean K8055 USB board. */
@@ -131,29 +136,17 @@ typedef struct k8055_device {
     /** Data last read from device, used by read_data(). */
     unsigned char data_in[PACKET_LENGTH];
 
-    /** Data to be sent to the device, used by write_data(). */
+    /** Data to be sent to the device, used by k8055_write_data(). */
     unsigned char data_out[PACKET_LENGTH];
 
     /** Underlying libusb handle to device. NULL if the device is not open. */
     libusb_device_handle *device_handle;
 } k8055_device;
 
-
-/* Global Variables
-* ================
-* Yes, unfortunately. However, as this program is meant to be a driver,
-* access to these variables from the outside should not occur. */
-
 /** Libusb context. */
 static libusb_context* context = NULL;
-
-/** This array contains all K8055 devices, regardless of their connection status. The index corresponds to a device's port. */
-static k8055_device devices[K8055_MAX_DEVICES];
-
+static int k8055_open_devices = 0;
 static int DEBUG = 0;
-
-/* end global variables */
-
 
 /** Prints the given message to standard output if debugging is enabled. */
 static void print_error(const char * str) {
@@ -162,24 +155,19 @@ static void print_error(const char * str) {
 	}
 }
 
-/** Retrieves the number of open devices. Internally, a device is open if it's libusb device handle is not null. */
-int k8055_count_open_devices() {
-	int r = 0;
-	for (int i = 0; i < K8055_MAX_DEVICES; ++i) {
-		if (devices[i].device_handle != NULL) r += 1;
+int k8055_open_device(int port, k8055_device** device) {
+	if (port < 0 || K8055_MAX_DEVICES <= port) {
+    		print_error("invalid port number, port p should be 0<=p<=3");
+    		return K8055_ERROR_INDEX;
 	}
-	return r;
-}
 
 
-int k8055_open_device(int port) {
-	if (k8055_count_open_devices() == 0) { /* no devices are open */
+	if (k8055_open_devices == 0) { /* no devices are open */
 		int r = libusb_init(&context); /* initialize a new context */
 		if (r < 0) {
 			print_error("could not initialize libusb");
 			return K8055_ERROR_INIT_LIBUSB; /* return error code in case of error */
 		}
-
 	}
 
 	libusb_device **connected_devices = NULL;
@@ -228,43 +216,46 @@ int k8055_open_device(int port) {
 		print_error("could not claim interface");
 		return K8055_ERROR_OPEN;
 	}
-
-	devices[port].device_handle = handle; /* mark device as open by assigning it a libusb device handle */
+	
+	k8055_device* _device = NULL;
+	_device = malloc(sizeof(k8055_device));
+	if (_device == NULL) {
+		print_error("could not allocate memory for device");
+		return K8055_ERROR_MEM;
+	}
+	
+	(*_device).device_handle = handle;
+	*device = _device;
+	k8055_open_devices += 1;
 
 	return 0;
 }
 
-void k8055_close_device(int port) {
-	if (devices[port].device_handle == NULL) /* already closed */
-		return;
-
-	libusb_release_interface(devices[port].device_handle, 0);
-	libusb_close(devices[port].device_handle);
-	devices[port].device_handle = NULL;
-	if (k8055_count_open_devices() == 0) libusb_exit(context);
+void k8055_close_device(k8055_device* device) {
+	libusb_release_interface(device->device_handle, 0);
+	libusb_close(device->device_handle);
+	device->device_handle = NULL;
+	free(device);
+	device = NULL;
+	
+	k8055_open_devices -= 1;
+	
+	if (k8055_open_devices <= 0) libusb_exit(context);
 }
 
-/** Writes the actual contained in the device's data_out field to the usb endpoint.
- * @return K8055_ERROR_INDEX if port is an invalid index
- * @return K8055_ERROR_CLOSED if the board associated to the given port is not open
+/** Writes the actual data contained in the device's data_out field to the usb endpoint.
+ * @return K8055_ERROR_CLOSED if the board is not open
  * @return K8055_ERROR_WRITE if another error occurred during the write process */
-static int write_data(int port) {
+static int k8055_write_data(k8055_device* device) {
     int write_status = 0;
 
-    if (port < 0 || K8055_MAX_DEVICES <= port) {
-    	print_error("invalid port number, port p should be 0<=p<=3");
-    	return K8055_ERROR_INDEX;
-    }
-
-    if (devices[port].device_handle == 0) {
-    	print_error("unable to write to port, device not open");
+    if (device->device_handle == NULL) {
+    	print_error("unable to write data, device not open");
     	return K8055_ERROR_CLOSED;
     }
 
-    k8055_device *device = &devices[port];
-
     int transferred = 0;
-    for(int i=0; i < 3; ++i) {
+    for(int i=0; i < WRITE_TRIES; ++i) { /* number of tries on failure */
     	write_status = libusb_interrupt_transfer(
     			device->device_handle,
     			USB_OUT_EP,
@@ -282,27 +273,19 @@ static int write_data(int port) {
 }
 
 /** Reads data from the usb endpoint into the device's data_in field.
- * @return K8055_ERROR_INDEX if port is an invalid index
- * @return K8055_ERROR_CLOSED if the board associated to the given port is not open
+ * @return K8055_ERROR_CLOSED if the board is not open
  * @return K8055_ERROR_READ if another error occurred during the read process */
-static int read_data(int port, int cycles) {
+static int read_data(k8055_device* device, int cycles) {
     int read_status = 0;
 
-    if (port < 0 || K8055_MAX_DEVICES <= port) {
-		print_error("invalid port number, port p should be 0<=p<=3");
-		return K8055_ERROR_INDEX;
-	}
-
-    if (devices[port].device_handle == 0) {
-        	print_error("unable to read from port, device not open");
+    if (device->device_handle == NULL) {
+        	print_error("unable to read data, device not open");
         	return K8055_ERROR_CLOSED;
     }
 
-    k8055_device *device = &devices[port];
-
     int transferred = 0;
-    for(int i = 0; i < 3; ++i) {
-    	for(int j = 0; j < cycles; ++j) { /* read twice to get fresh data, (i.e. circumvent some kind of buffer) */
+    for(int i = 0; i < READ_TRIES; ++i) { /* number of tries on failure */
+    	for(int j = 0; j < cycles; ++j) { /* read at least twice to get fresh data, (i.e. circumvent some kind of buffer) */
     		read_status = libusb_interrupt_transfer(
     				device->device_handle,
     				USB_IN_EP,
@@ -320,8 +303,7 @@ static int read_data(int port, int cycles) {
 	return 0;
 }
 
-static int int_to_debounce(int x) {
-	int t = x;
+static int k8055_int_to_debounce(int t) {
 	/* the velleman k8055 use a exponetial formula to split up the
 	 DebounceTime 0-7450 over value 1-255. I've tested every value and
 	 found that the formula dbt=0,338*value^1,8017 is closest to
@@ -337,15 +319,13 @@ static int int_to_debounce(int x) {
 	return t;
 }
 
-int k8055_set_all_digital(int port, int bitmask) {
-	k8055_device *device = &devices[port];
+int k8055_set_all_digital(k8055_device* device, int bitmask) {
 	device->data_out[OUT_DIGITAL_OFFSET] = bitmask;
-	device->data_out[0] = CMD_SET_ANALOG_DIGITAL;
-	return write_data(port);
+	device->data_out[OUT_CMD_OFFEST] = CMD_SET_ANALOG_DIGITAL;
+	return k8055_write_data(device);
 }
 
-int k8055_set_digital(int port, int channel, int value) {
-	k8055_device *device = &devices[port];
+int k8055_set_digital(k8055_device* device, int channel, int value) {
 
 	unsigned char data = device->data_out[OUT_DIGITAL_OFFSET];
 	if (value == 0) /* off */
@@ -354,94 +334,82 @@ int k8055_set_digital(int port, int channel, int value) {
 		data = data | (1 << channel);
 
 	device->data_out[OUT_DIGITAL_OFFSET] = data;
-	device->data_out[0] = CMD_SET_ANALOG_DIGITAL;
-	return write_data(port);
+	device->data_out[OUT_CMD_OFFEST] = CMD_SET_ANALOG_DIGITAL;
+	return k8055_write_data(device);
 }
 
-int k8055_set_all_analog(int port, int analog1, int analog2) {
-	k8055_device *device = &devices[port];
+int k8055_set_all_analog(k8055_device* device, int analog0, int analog1) {
+	device->data_out[OUT_ANALOG_0_OFFSET] = analog0;
 	device->data_out[OUT_ANALOG_1_OFFSET] = analog1;
-	device->data_out[OUT_ANALOG_2_OFFSET] = analog2;
-	device->data_out[0] = CMD_SET_ANALOG_DIGITAL;
-	return write_data(port);
+	device->data_out[OUT_CMD_OFFEST] = CMD_SET_ANALOG_DIGITAL;
+	return k8055_write_data(device);
 }
 
-int k8055_set_analog(int port, int channel, int value) {
-	k8055_device *device = &devices[port];
+int k8055_set_analog(k8055_device* device, int channel, int value) {
 
 	if (channel == 0) {
-		device->data_out[OUT_ANALOG_1_OFFSET] = value;
+		device->data_out[OUT_ANALOG_0_OFFSET] = value;
 	} else if (channel == 1) {
-		device->data_out[OUT_ANALOG_2_OFFSET] = value;
+		device->data_out[OUT_ANALOG_1_OFFSET] = value;
 	} else {
 		print_error("can't write to unknown analog port");
 		return K8055_ERROR_INDEX;
 	}
 
-	device->data_out[0] = CMD_SET_ANALOG_DIGITAL;
-	return write_data(port);
+	device->data_out[OUT_CMD_OFFEST] = CMD_SET_ANALOG_DIGITAL;
+	return k8055_write_data(device);
 }
 
-int k8055_reset_counter(int port, int counter) {
-	k8055_device *device = &devices[port];
+int k8055_reset_counter(k8055_device* device, int counter) {
 
 	if (counter == 0) {
-		device->data_out[OUT_COUNTER_1_OFFSET] = 0;
-		device->data_out[0] = CMD_RESET_COUNTER_1;
+		device->data_out[OUT_COUNTER_0_OFFSET] = 0;
+		device->data_out[OUT_CMD_OFFEST] = CMD_RESET_COUNTER_0;
 	} else if (counter == 1) {
-		device->data_out[OUT_COUNTER_2_OFFSET] = 0;
-		device->data_out[0] = CMD_RESET_COUNTER_2;
+		device->data_out[OUT_COUNTER_1_OFFSET] = 0;
+		device->data_out[OUT_CMD_OFFEST] = CMD_RESET_COUNTER_1;
 	} else {
 		print_error("can't reset unknown counter");
 		return K8055_ERROR_INDEX;
 	}
 
-	return write_data(port);
+	return k8055_write_data(device);
 }
 
-int k8055_set_debounce_time(int port, int counter, int debounce) {
-	k8055_device *device = &devices[port];
+int k8055_set_debounce_time(k8055_device* device, int counter, int debounce) {
 
 	if (counter == 0) {
-		device->data_out[OUT_COUNTER_1_DEBOUNCE_OFFSET] = int_to_debounce(debounce);
-		device->data_out[0] = CMD_SET_DEBOUNCE_1;
+		device->data_out[OUT_COUNTER_0_DEBOUNCE_OFFSET] = k8055_int_to_debounce(debounce);
+		device->data_out[OUT_CMD_OFFEST] = CMD_SET_DEBOUNCE_1;
 	} else if (counter == 1) {
-		device->data_out[OUT_COUNTER_2_DEBOUNCE_OFFSET] = int_to_debounce(debounce);
-		device->data_out[0] = CMD_SET_DEBOUNCE_2;
+		device->data_out[OUT_COUNTER_1_DEBOUNCE_OFFSET] = k8055_int_to_debounce(debounce);
+		device->data_out[OUT_CMD_OFFEST] = CMD_SET_DEBOUNCE_2;
 	} else {
 		print_error("can't set debounce time for unknown counter");
 		return K8055_ERROR_INDEX;
 	}
 
-	return write_data(port);
+	return k8055_write_data(device);
 }
 
-static int get_all_cycle(int port, int *bitmask, int *analog1, int *analog2, int *counter1, int *counter2, int cycles) {
-	int r = read_data(port, cycles);
+int k8055_get_all_input(k8055_device* device, int *bitmask, int *analog0, int *analog1, int *counter0, int *counter1, int quick) {
+	int cycles = 2;
+	if (quick) cycles = 1;
+	int r = read_data(device, cycles);
 	if (r != 0) return r;
-
-	k8055_device *device = &devices[port];
 
 	if (bitmask != NULL)
 		*bitmask = (
 				((device->data_in[IN_DIGITAL_OFFSET] >> 4) & 0x03) | /* Input 1 and 2 */
 				((device->data_in[IN_DIGITAL_OFFSET] << 2) & 0x04) | /* Input 3 */
 				((device->data_in[IN_DIGITAL_OFFSET] >> 3) & 0x18)); /* Input 4 and 5 */
+	if (analog0 != NULL)
+		*analog0 = device->data_in[IN_ANALOG_0_OFFSET];
 	if (analog1 != NULL)
 		*analog1 = device->data_in[IN_ANALOG_1_OFFSET];
-	if (analog2 != NULL)
-		*analog2 = device->data_in[IN_ANALOG_2_OFFSET];
+	if (counter0 != NULL)
+		*counter0 = (int) device->data_in[IN_COUNTER_0_OFFSET + 1] << 8 | device->data_in[IN_COUNTER_0_OFFSET];
 	if (counter1 != NULL)
 		*counter1 = (int) device->data_in[IN_COUNTER_1_OFFSET + 1] << 8 | device->data_in[IN_COUNTER_1_OFFSET];
-	if (counter2 != NULL)
-		*counter2 = (int) device->data_in[IN_COUNTER_2_OFFSET + 1] << 8 | device->data_in[IN_COUNTER_2_OFFSET];
 	return 0;
-}
-
-int k8055_get_all_input(int port, int *bitmask, int *analog1, int *analog2, int *counter1, int *counter2) {
-	return get_all_cycle(port, bitmask, analog1, analog2, counter1, counter2, 2);
-}
-
-int k8055_quick_get_all_input(int port, int *bitmask, int *analog1, int *analog2, int *counter1, int *counter2) {
-	return get_all_cycle(port, bitmask, analog1, analog2, counter1, counter2, 1);
 }
