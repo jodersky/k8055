@@ -29,6 +29,8 @@
 #ifndef K8055_H_
 #define K8055_H_
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -123,7 +125,7 @@ int k8055_set_debounce_time(k8055_device*, int counter, int debounce);
  * @return 0 on success
  * @return K8055_ERROR_CLOSED if the given device is not open
  * @return K8055_ERROR_READ if another error occurred during the read process */
-int k8055_get_all_input(k8055_device*, int *digitalBitmask, int *analog0, int *analog1, int *counter0, int *counter1, int quick);
+int k8055_get_all_input(k8055_device*, int *digitalBitmask, int *analog0, int *analog1, int *counter0, int *counter1, bool quick);
 
 #ifdef __cplusplus
 }

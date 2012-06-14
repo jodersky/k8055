@@ -131,7 +131,7 @@
 #include "k8055.h"
 
 /** Represents a Vellemean K8055 USB board. */
-typedef struct k8055_device {
+struct k8055_device {
     
     /** Data last read from device, used by read_data(). */
     unsigned char data_in[PACKET_LENGTH];
@@ -141,7 +141,7 @@ typedef struct k8055_device {
 
     /** Underlying libusb handle to device. NULL if the device is not open. */
     libusb_device_handle *device_handle;
-} k8055_device;
+};
 
 /** Libusb context. */
 static libusb_context* context = NULL;
@@ -392,7 +392,7 @@ int k8055_set_debounce_time(k8055_device* device, int counter, int debounce) {
 	return k8055_write_data(device);
 }
 
-int k8055_get_all_input(k8055_device* device, int *bitmask, int *analog0, int *analog1, int *counter0, int *counter1, int quick) {
+int k8055_get_all_input(k8055_device* device, int *bitmask, int *analog0, int *analog1, int *counter0, int *counter1, bool quick) {
 	int cycles = 2;
 	if (quick) cycles = 1;
 	int r = read_data(device, cycles);
