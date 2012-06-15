@@ -38,9 +38,7 @@ extern "C" {
 typedef struct k8055_device k8055_device;
 
 enum k8055_error_code {
-	K8055_SUCCESS = 0,
-	K8055_ERROR = -1,
-	K8055_ERROR_INIT_LIBUSB = -2, /* error during libusb initialization */
+	K8055_SUCCESS = 0, K8055_ERROR = -1, K8055_ERROR_INIT_LIBUSB = -2, /* error during libusb initialization */
 	K8055_ERROR_NO_DEVICES = -3, /* no usb devices found on host machine */
 	K8055_ERROR_NO_K8055 = -4, /* Velleman k8055 cannot be found (on given port) */
 	K8055_ERROR_ACCESS = -6, /* access denied (insufficient permissions) */
@@ -125,7 +123,8 @@ int k8055_set_debounce_time(k8055_device*, int counter, int debounce);
  * @return 0 on success
  * @return K8055_ERROR_CLOSED if the given device is not open
  * @return K8055_ERROR_READ if another error occurred during the read process */
-int k8055_get_all_input(k8055_device*, int *digitalBitmask, int *analog0, int *analog1, int *counter0, int *counter1, bool quick);
+int k8055_get_all_input(k8055_device*, int *digitalBitmask, int *analog0,
+		int *analog1, int *counter0, int *counter1, bool quick);
 
 #ifdef __cplusplus
 }
