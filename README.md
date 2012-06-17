@@ -40,13 +40,12 @@ See the comments in the source code for documentation about usage. Note: the API
 Run ```make doc``` to generate doxygen documentation.
 
 ## Authors
-The library is written by Jakob Odersky. Nevertheless, it is based on the information provided by the following people who wrote the original version of `libk8055' (http://libk8055.sourceforge.net) :
+The library is written by Jakob Odersky. It is based on the information provided by the following people who wrote the original version of `libk8055' (http://libk8055.sourceforge.net) :
 
 - 2005 by Sven Lindberg <k8055@k8055.mine.nu>
 
 - 2007 by Pjetur G. Hjaltason <pjetur@pjetur.net> Commenting, general rearrangement of code, bugfixes, python interface with swig and simple k8055 python class
 
-Thanks alot to you!
 
 ## License
 Copyright (c) 2012 by Jakob Odersky
