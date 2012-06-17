@@ -350,10 +350,10 @@ int k8055_set_all_digital(k8055_device* device, int bitmask) {
 	return k8055_write_data(device);
 }
 
-int k8055_set_digital(k8055_device* device, int channel, int value) {
+int k8055_set_digital(k8055_device* device, int channel, bool value) {
 
 	unsigned char data = device->data_out[OUT_DIGITAL_OFFSET];
-	if (value == 0) /* off */
+	if (value == false) /* off */
 		data = data & ~(1 << channel);
 	else
 		/* on */

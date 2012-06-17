@@ -73,10 +73,10 @@ int k8055_set_all_digital(k8055_device* device, int bitmask);
 /**Sets a digital output at given channel.
  * @param device k8055 board
  * @param channel channel of port
- * @param value output status: '1' for 'on', '0' for 'off'
+ * @param value output status: 'true' for on, 'false' for off
  * @return K8055_ERROR_CLOSED if the given device is not open
  * @return K8055_ERROR_WRITE if another error occurred during the write process */
-int k8055_set_digital(k8055_device* device, int channel, int value);
+int k8055_set_digital(k8055_device* device, int channel, bool value);
 
 /**Sets the values of both analog outputs.
  * @param device k8055 board
