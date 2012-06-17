@@ -13,7 +13,10 @@ This library provides access to the Velleman K8055 USB Experiment Board for oper
 - (doxygen for documentation generation)
 
 ## Build
-Run ```make``` in the project root folder. Products are copied to `target' directory.
+### Local build
+Run ```make``` or ```make local``` in the project root folder. Products are copied to `target' directory.
+
+To remove all generated files, run ```make clean```.
 
 ### Udev Rules
 If your system uses udev, you will probably have to configure it to allow access the k8055 boards. The following instructions show how to configure udev (you will need root privileges).
@@ -24,14 +27,23 @@ If your system uses udev, you will probably have to configure it to allow access
 
 2. Create a group named k8055.
 
-    ```groupadd k8055```
+    ```groupadd -r k8055```
 
 3. Add to the group yourself and/or other users whom you wish to grant access to the boards.
 
     ```usermod -a -G k8055 $(USER)```
 
-The previously described steps may be automated by running ```make install-rules``` to install just the rules or ```make install-permissions users="<list of users>"``` to also create the group and add the given list of users to it.
+The previously described steps may be automated by running ```make install-rules``` to install just the rules or ```make install-permissions USERS="<list of users>"``` to also create the group and add the given list of users to it.
 To uninstall, run ```make uninstall-rules``` or ```make uninstall-permissions```.
+
+### System install
+Run  ```make install-product``` to install the library and header files (this command does essentially the same as a local build with the exception that products are copied to /usr/local/ by default). You may change that path by passing `make' the variable `PREFIX', i.e. ```make install PREFIX=/my/custom/path```. To uninstall, run ```make uninstall-product```.
+
+Note that the above commands only install/uninstall the library and header files, udev configuration is not performed. To perform a complete installation and udev configuration, run the command
+
+	```make install USERS="<list of users>"```
+
+Uninstallation is done by ```make uninstall```.
 
 
 ## Documentation

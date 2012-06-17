@@ -1,6 +1,6 @@
 PREFIX = /usr/local
 
-
+#run this if you want to build everything but not install user-wide or system-wide
 local: compile copy
 
 compile:
@@ -36,15 +36,15 @@ install-permissions: install-rules
 uninstall-permissions: uninstall-rules
 	groupdel k8055
 
-install: compile
+install-product: compile
 	cp src/*.so $(PREFIX)/lib
 	cp src/*.h $(PREFIX)/include
 
-uninstall:
+uninstall-product:
 	rm $(PREFIX)/lib/libk8055.so
 	rm $(PREFIX)/include/k8055.h
 	
-install-all: install install-permissions
+install: install-product install-permissions
 
-uninstall-all: uninstall-permissions uninstall
+uninstall: uninstall-permissions uninstall-product
 
