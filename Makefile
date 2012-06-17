@@ -30,7 +30,7 @@ uninstall-rules:
 	rm /etc/udev/rules.d/k8055.rules
 
 install-permissions: install-rules
-	groupadd -f k8055
+	groupadd -rf k8055
 	$(foreach user, $(USERS), usermod -a -G k8055 $(user);)
 
 uninstall-permissions: uninstall-rules
