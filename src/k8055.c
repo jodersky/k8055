@@ -132,11 +132,13 @@
 /** Represents a Vellemean K8055 USB board. */
 struct k8055_device {
 
-	/** Data last read from device, used by read_data(). */
+	/** Data last read from device, used by k8055_read_data(). */
 	unsigned char data_in[PACKET_LENGTH];
 
 	/** Data to be sent to the device, used by k8055_write_data(). */
 	unsigned char data_out[PACKET_LENGTH];
+
+	unsigned char current_out[PACKET_LENGTH];
 
 	/** Underlying libusb handle to device. NULL if the device is not open. */
 	libusb_device_handle *device_handle;
@@ -223,8 +225,21 @@ int k8055_open_device(int port, k8055_device** device) {
 		print_error("could not allocate memory for device");
 		return K8055_ERROR_MEM;
 	}
-
-	(*_device).device_handle = handle;
+	
+	_device->device_handle = handle; /* add usb handle */
+	
+	for (int i = 0; i < PACKET_LENGTH; ++i) { /* initialize command data */
+		_device->data_out[i]=0;
+		_device->current_out[i]=0;
+	}
+	
+	k8055_set_all_digital(_device, 0);
+	k8055_set_all_analog(_device, 0, 0);
+	k8055_set_debounce_time(_device, 0, 2);
+	k8055_set_debounce_time(_device, 1, 2);
+	k8055_reset_counter(_device, 1);
+	k8055_reset_counter(_device, 1);
+	
 	*device = _device;
 	k8055_open_devices += 1;
 
@@ -267,13 +282,19 @@ static int k8055_write_data(k8055_device* device) {
 		print_error("could not write packet");
 		return K8055_ERROR_WRITE;
 	}
+	
+	/* if there was no error up to this point, assume that data_out now reflects the devices output status */
+	for (int i = 0; i < PACKET_LENGTH; ++i) {
+		device->current_out[i]=device->data_out[i];
+	}
+	
 	return 0;
 }
 
 /** Reads data from the usb endpoint into the device's data_in field.
  * @return K8055_ERROR_CLOSED if the board is not open
  * @return K8055_ERROR_READ if another error occurred during the read process */
-static int read_data(k8055_device* device, int cycles) {
+static int k8055_read_data(k8055_device* device, int cycles) {
 	int read_status = 0;
 
 	if (device->device_handle == NULL) {
@@ -298,7 +319,7 @@ static int read_data(k8055_device* device, int cycles) {
 	return 0;
 }
 
-static int k8055_int_to_debounce(int t) {
+static unsigned char k8055_ms_to_char(int t) {
 	/* the velleman k8055 use a exponetial formula to split up the
 	 DebounceTime 0-7450 over value 1-255. I've tested every value and
 	 found that the formula dbt=0,338*value^1,8017 is closest to
@@ -306,9 +327,18 @@ static int k8055_int_to_debounce(int t) {
 	 found the formula dbt=0,115*x^2 quite near the actual values, a
 	 little below at really low values and a little above at really
 	 high values. But the time set with this formula is within +-4% */
-	if (t > 7450)
-		t = 7450;
-	t = sqrt(t / 0.115);
+	
+	int c = t;
+	
+	if (c > 7450)
+		c = 7450;
+	c = sqrt(c / 0.115);
+	if (c > ((int) c + 0.49999999)) /* simple round() function) */
+		c += 1;
+	return (unsigned char) c;
+}
+static int k8055_char_to_ms(unsigned char c) {
+	double t = 0.115 * c * c;
 	if (t > ((int) t + 0.49999999)) /* simple round() function) */
 		t += 1;
 	return t;
@@ -375,11 +405,11 @@ int k8055_reset_counter(k8055_device* device, int counter) {
 int k8055_set_debounce_time(k8055_device* device, int counter, int debounce) {
 
 	if (counter == 0) {
-		device->data_out[OUT_COUNTER_0_DEBOUNCE_OFFSET] = k8055_int_to_debounce(
+		device->data_out[OUT_COUNTER_0_DEBOUNCE_OFFSET] = k8055_ms_to_char(
 				debounce);
 		device->data_out[OUT_CMD_OFFEST] = CMD_SET_DEBOUNCE_1;
 	} else if (counter == 1) {
-		device->data_out[OUT_COUNTER_1_DEBOUNCE_OFFSET] = k8055_int_to_debounce(
+		device->data_out[OUT_COUNTER_1_DEBOUNCE_OFFSET] = k8055_ms_to_char(
 				debounce);
 		device->data_out[OUT_CMD_OFFEST] = CMD_SET_DEBOUNCE_2;
 	} else {
@@ -395,7 +425,7 @@ int k8055_get_all_input(k8055_device* device, int *bitmask, int *analog0,
 	int cycles = 2;
 	if (quick)
 		cycles = 1;
-	int r = read_data(device, cycles);
+	int r = k8055_read_data(device, cycles);
 	if (r != 0)
 		return r;
 
@@ -414,4 +444,19 @@ int k8055_get_all_input(k8055_device* device, int *bitmask, int *analog0,
 		*counter1 = (int) device->data_in[IN_COUNTER_1_OFFSET + 1] << 8
 		| device->data_in[IN_COUNTER_1_OFFSET];
 	return 0;
+}
+
+void k8055_get_all_output(k8055_device* device, int* bitmask, int *analog0,
+		int *analog1, int *debounce0, int *debounce1) {
+	
+	if (bitmask != NULL)
+		*bitmask = device->current_out[OUT_DIGITAL_OFFSET];
+	if (analog0 != NULL)
+		*analog0 = device->current_out[OUT_ANALOG_0_OFFSET];
+	if (analog1 != NULL)
+		*analog1 = device->current_out[OUT_ANALOG_1_OFFSET];
+	if (debounce0 != NULL)
+		*debounce0 = k8055_char_to_ms(device->current_out[OUT_COUNTER_0_DEBOUNCE_OFFSET]);
+	if (debounce1 != NULL)
+		*debounce1 = k8055_char_to_ms(device->current_out[OUT_COUNTER_1_DEBOUNCE_OFFSET]);
 }
