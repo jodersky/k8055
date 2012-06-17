@@ -14,7 +14,7 @@ This library provides access to the Velleman K8055 USB Experiment Board for oper
 
 ## Build
 ### Local build
-Run ```make``` or ```make local``` in the project root folder. Products are copied to `target' directory.
+Run ```make``` or ```make local``` in the project root folder. Products are copied to 'target' directory.
 
 To remove all generated files, run ```make clean```.
 
@@ -37,7 +37,7 @@ The previously described steps may be automated by running ```make install-rules
 To uninstall, run ```make uninstall-rules``` or ```make uninstall-permissions```.
 
 ### System install
-Run  ```make install-product``` to install the library and header files (this command does essentially the same as a local build with the exception that products are copied to /usr/local/ by default). You may change that path by passing `make' the variable `PREFIX', i.e. ```make install PREFIX=/my/custom/path```. To uninstall, run ```make uninstall-product```.
+Run  ```make install-product``` to install the library and header files (this command does essentially the same as a local build with the exception that products are copied to /usr/local/ by default). You may change that path by passing 'make' the variable 'PREFIX', i.e. ```make install PREFIX=/my/custom/path```. To uninstall, run ```make uninstall-product```.
 
 Note that the above commands only install/uninstall the library and header files, udev configuration is not performed. To perform a complete installation and udev configuration, run the command
 
