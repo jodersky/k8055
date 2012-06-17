@@ -41,7 +41,7 @@ Run  ```make install-product``` to install the library and header files (this co
 
 Note that the above commands only install/uninstall the library and header files, udev configuration is not performed. To perform a complete installation and udev configuration, run the command
 
-	```make install USERS="<list of users>"```
+	make install USERS="<list of users>"
 
 Uninstallation is done by ```make uninstall```.
 
