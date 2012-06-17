@@ -1,10 +1,11 @@
 # k8055 for libusb-1.0
 
-This library acts as a driver for the Velleman K8055 USB Experiment Board for operating systems supporting libusb-1.0 (http://www.libusb.org/wiki/libusb-1.0), such as Linux. While providing a high-level interface for the user, the library communicates with a k8055 board through libusb.
+This library provides access to the Velleman K8055 USB Experiment Board for operating systems supporting libusb-1.0 (http://www.libusb.org/wiki/libusb-1.0), such as Linux. While providing a high-level interface to the user, the library communicates with a k8055 board through libusb.
 
 ## Main Features
 - runs with libusb-1.0
 - up to 4 k8055 boards supported simultaneously (limit is given by k8055 hardware)
+- pseudo-querying of a board's ouput status (see header file documentation for detailed explanation)
 - lightweight (one source file, one header file => one shared library)
 
 ## Requirements
@@ -49,6 +50,7 @@ Thanks alot to you!
 
 ## License
 Copyright (c) 2012 by Jakob Odersky
+
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
