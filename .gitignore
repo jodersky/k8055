@@ -3,6 +3,6 @@ target/
 .project
 .cproject
 src/*.o
-src/*.so
+src/*.so.*
 src/k8055-*
 *~

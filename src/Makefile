@@ -5,8 +5,7 @@ CFLAGS = -std=c99 -O2 -Wall
 all: libk8055.so
 	
 libk8055.so: k8055.o
-	$(C) -shared -o libk8055.so k8055.o -lusb-1.0 -lm
-
+	$(C) -shared -Wl,-soname,libk8055.so.1 -o libk8055.so.1.0 k8055.o -lusb-1.0 -lm
 
 libk8055.a: k8055.o
 	$(C) -o libk8055.a k8055.o -lusb-1.0 -lm
@@ -16,7 +15,7 @@ k8055.o: k8055.c
 
 clean:
 	rm -rf *.o
-	rm -rf *.so
+	rm -rf *.so.*
 	rm -rf k8055-*
 
 test: k8055.c test.c
