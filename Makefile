@@ -12,8 +12,9 @@ clean:
 	make clean -C src
 	rm -rf target
 
+dist-clean: clean
+
 mkdirs:
-	mkdir -p target
 	mkdir -p target/lib
 	mkdir -p target/include
 
@@ -38,6 +39,8 @@ uninstall-permissions: uninstall-rules
 	groupdel k8055
 
 install: compile
+	mkdir -p $(PREFIX)/lib
+	mkdir -p $(PREFIX)/include
 	cp src/*.so $(PREFIX)/lib
 	cp src/*.h $(PREFIX)/include
 
