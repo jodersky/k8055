@@ -24,7 +24,20 @@
  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+
+ Thanks to the following people who wrote the original version of `libk8055'
+ (http://libk8055.sourceforge.net/), without their useful comments this
+ library would not have been possible:
+
+ 2005 by Sven Lindberg <k8055@k8055.mine.nu>
+
+ 2007 by Pjetur G. Hjaltason <pjetur@pjetur.net>
+ Commenting, general rearrangement of code, bugfixes,
+ python interface with swig and simple k8055 python class
+
+ The comments explaining the data packets and debounce time conversion
+ (in the source file) are from them.
+*/
 
 #ifndef K8055_H_
 #define K8055_H_
@@ -49,6 +62,8 @@ enum k8055_error_code {
 	K8055_ERROR_INDEX = -11, /* invalid argument (i.e. trying to access analog channel >= 2) */
 	K8055_ERROR_MEM = -12 /* memory allocation error */
 };
+
+void k8055_debug(bool value);
 
 /**Opens a K8055 device on the given port (i.e. address).
  * @return 0 on success

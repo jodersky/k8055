@@ -37,13 +37,9 @@ The previously described steps may be automated by running ```make install-rules
 To uninstall, run ```make uninstall-rules``` or ```make uninstall-permissions```.
 
 ### System install
-Run  ```make install-product``` to install the library and header files (this command does essentially the same as a local build with the exception that products are copied to /usr/local/ by default). You may change that path by passing 'make' the variable 'PREFIX', i.e. ```make install PREFIX=/my/custom/path```. To uninstall, run ```make uninstall-product```.
+Run  ```make install``` to install the library and header files (this command does essentially the same as a local build with the exception that products are copied to /usr/local/ by default). You may change that path by passing 'make' the variable 'PREFIX', i.e. ```make install PREFIX=/my/custom/path```. To uninstall, run ```make uninstall```.
 
-Note that the above commands only install/uninstall the library and header files, udev configuration is not performed. To perform a complete installation and udev configuration, run the command
-
-	make install USERS="<list of users>"
-
-Uninstallation is done by ```make uninstall```.
+Note that the above commands only install/uninstall the library and header files, udev configuration is not performed.
 
 
 ## Documentation

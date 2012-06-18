@@ -26,7 +26,8 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  Thanks to the following people who wrote the original version of `libk8055'
- (http://libk8055.sourceforge.net/):
+ (http://libk8055.sourceforge.net/), without their useful comments this
+ library would not have been possible:
 
  2005 by Sven Lindberg <k8055@k8055.mine.nu>
 
@@ -34,7 +35,8 @@
  Commenting, general rearrangement of code, bugfixes,
  python interface with swig and simple k8055 python class
 
- The comments explaining the data packets and debounce time conversion are from them.
+ The comments explaining the data packets and debounce time conversion
+ (in the source file) are from them.
 
  Input packet format
 
@@ -126,7 +128,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include <libusb.h>
+#include <libusb-1.0/libusb.h>
 #include "k8055.h"
 
 /** Represents a Vellemean K8055 USB board. */
@@ -147,12 +149,16 @@ struct k8055_device {
 /** Libusb context. */
 static libusb_context* context = NULL;
 static int k8055_open_devices = 0;
-static int DEBUG = 0;
+static int debug = 0;
+
+void k8055_debug(bool value) {
+	debug = value;
+}
 
 /** Prints the given message to standard output if debugging is enabled. */
 static void print_error(const char * str) {
-	if (DEBUG) {
-		printf("%s", str);
+	if (debug) {
+		printf("%s\n", str);
 	}
 }
 
