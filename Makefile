@@ -5,7 +5,7 @@ compile:
 	make -C src
 
 copy: compile mkdirs
-	cp src/*.so.* target/lib
+	cp src/*.so target/lib
 	cp src/*.h target/include
 
 clean:
@@ -41,9 +41,9 @@ uninstall-permissions: uninstall-rules
 install: compile
 	mkdir -p $(PREFIX)/lib
 	mkdir -p $(PREFIX)/include
-	cp src/*.so.* $(PREFIX)/lib
+	cp src/*.so $(PREFIX)/lib
 	cp src/*.h $(PREFIX)/include
 
 uninstall:
-	rm -f $(PREFIX)/lib/libk8055.so.1.0
-	rm -f $(PREFIX)/include/k8055.h
+	rm $(PREFIX)/lib/libk8055.so
+	rm $(PREFIX)/include/k8055.h
