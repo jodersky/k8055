@@ -14,7 +14,7 @@ This library provides access to the Velleman K8055 USB Experiment Board for oper
 
 ## Build
 ### Local build
-Run ```make``` or ```make local``` in the project root folder. Products are copied to 'target' directory.
+Run ```make local``` in the project root folder. Products are copied to 'target' directory.
 
 To remove all generated files, run ```make clean```.
 
