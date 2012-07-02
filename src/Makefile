@@ -6,6 +6,7 @@ VERSION=$(VERSION_MAJOR).$(VERSION_MINOR)
 
 libk8055.so: libk8055.so.$(VERSION)
 	ln -s libk8055.so.$(VERSION) libk8055.so
+	ln -s libk8055.so.$(VERSION) libk8055.so.$(VERSION_MAJOR)
 
 libk8055.so.$(VERSION): k8055.o
 	$(C) $(CFLAGS) -shared -Wl,-soname,libk8055.so.$(VERSION_MAJOR) -o libk8055.so.$(VERSION) k8055.o -lusb-1.0 -lm
