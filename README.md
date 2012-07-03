@@ -84,7 +84,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ## Tested
 
-Prior to version 1.0:
+Prior to version 1.0
 
 - Ubuntu 11.04, kernel 2.6.38-13-generic, x86_64, March 2012
 - Ubuntu 11.10, kernel 3.0.0-16-generic, i686, March 2012
