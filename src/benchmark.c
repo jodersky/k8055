@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
 		gettimeofday(&t, NULL);
 		us += (t.tv_sec - t0.tv_sec) * 1000000 + t.tv_usec - t0.tv_usec;
 	}
-	printf("average read time for %i iterations: %i [ms]\n", ITERATIONS, us / ITERATIONS / 1000);
+	printf("average read time for %i iterations: %.3f [ms]\n", ITERATIONS, 1.0 * us / ITERATIONS / 1000);
 	
 	us = 0;
 	for (int i = 0; i < ITERATIONS; ++i) {
@@ -36,5 +36,5 @@ int main(int argc, char *argv[]) {
 		gettimeofday(&t, NULL);
 		us += (t.tv_sec - t0.tv_sec) * 1000000 + t.tv_usec - t0.tv_usec;
 	}
-	printf("average quick read time for %i iterations: %i [ms]\n", ITERATIONS, us / ITERATIONS / 1000);
+	printf("average quick read time for %i iterations: %.3f [ms]\n", ITERATIONS, 1.0 *  us / ITERATIONS / 1000);
 }
