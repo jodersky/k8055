@@ -27,7 +27,7 @@ uninstall-rules:
 	rm -f $(UDEV)/k8055.rules
 
 install-permissions: install-rules
-	groupadd -f k8055
+	groupadd --force --system k8055
 	$(foreach user, $(USERS), usermod -a -G k8055 $(user);)
 
 uninstall-permissions: uninstall-rules
