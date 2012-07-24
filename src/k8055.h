@@ -72,7 +72,8 @@ void k8055_debug(bool value);
  * @return K8055_ERROR_NO_DEVICES if no usb devices are found on host system
  * @return K8055_ERROR_NO_K8055 if no K8055 board is found at the given port
  * @return K8055_ERROR_ACCESS if permission is denied to access a usb port
- * @return K8055_ERROR_OPEN if another error occured preventing the board to be opened */
+ * @return K8055_ERROR_OPEN if another error occured preventing the board to be opened
+ * @return K8055_ERROR_MEM if memory could not be allocated for device */
 int k8055_open_device(int port, k8055_device** device);
 
 /** Closes the given device. */
