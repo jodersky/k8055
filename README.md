@@ -5,11 +5,11 @@ This library provides access to the Velleman K8055 USB Experiment Board for oper
 ## Main Features
 - runs with libusb-1.0
 - up to 4 k8055 boards supported simultaneously (limit is given by k8055 hardware)
-- pseudo-querying of a board's ouput status (see header file documentation for detailed explanation)
-- lightweight (one source file, one header file => one shared library)
+- pseudo-querying of a board's output status (see header file documentation for detailed explanation)
+- concise and lightweight
 
 ## Requirements
-- libusb-1.0 (see src/Makefile to set include path)
+- libusb-1.0
 - (doxygen for documentation generation)
 
 ## Build
@@ -18,8 +18,11 @@ Run ```make local``` in the project root folder. Products are copied to 'target'
 
 To remove all generated files, run ```make clean```.
 
+### System install
+Run  ```make install``` to install the library and header files (this command does essentially the same as a local build with the exception that products are copied to /usr/local/ by default). You may change that path by passing 'make' the variable 'PREFIX', i.e. ```make install PREFIX=/my/custom/path```. To uninstall, run ```make uninstall```.
+
 ### Udev Rules
-If your system uses udev, you will probably have to configure it to allow access the k8055 boards. The following instructions show how to configure udev (you will need root privileges).
+If your system uses udev, you will probably have to configure it to allow access to the k8055 boards. The following instructions show how to configure udev (you will need root privileges).
 
 1. Copy the file `k8055.rules' into the udev rules directory, typically /etc/udev/rules.d
 
@@ -35,12 +38,6 @@ If your system uses udev, you will probably have to configure it to allow access
 
 The previously described steps may be automated by running ```make install-rules``` to install just the rules or ```make install-permissions USERS="<list of users>"``` to also create the group and add the given list of users to it.
 To uninstall, run ```make uninstall-rules``` or ```make uninstall-permissions```.
-
-### System install
-Run  ```make install``` to install the library and header files (this command does essentially the same as a local build with the exception that products are copied to /usr/local/ by default). You may change that path by passing 'make' the variable 'PREFIX', i.e. ```make install PREFIX=/my/custom/path```. To uninstall, run ```make uninstall```.
-
-Note that the above commands only install/uninstall the library and header files, udev configuration is not performed.
-
 
 ## Documentation
 See the comments in the source code for documentation about usage. Note: the API isn't the same as the one provided by Velleman in their DLL.
