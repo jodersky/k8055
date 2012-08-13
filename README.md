@@ -1,4 +1,4 @@
-# k8055 for libusb-1.0
+# k8055 for libusb-1.0 (specifically for Linux)
 
 This library provides access to the Velleman K8055 USB Experiment Board for operating systems supporting libusb-1.0 (http://www.libusb.org/wiki/libusb-1.0), such as Linux. While providing a high-level interface to the user, the library communicates with a k8055 board through libusb.
 
