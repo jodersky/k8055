@@ -243,7 +243,7 @@ int k8055_open_device(int port, k8055_device** device) {
 	k8055_set_all_analog(_device, 0, 0);
 	k8055_set_debounce_time(_device, 0, 2);
 	k8055_set_debounce_time(_device, 1, 2);
-	k8055_reset_counter(_device, 1);
+	k8055_reset_counter(_device, 0);
 	k8055_reset_counter(_device, 1);
 	
 	*device = _device;
