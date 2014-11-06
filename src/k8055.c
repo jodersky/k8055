@@ -226,7 +226,7 @@ int k8055_open_device(int port, k8055_device** device) {
 	}
 
 	k8055_device* _device = NULL;
-	_device = malloc(sizeof(k8055_device));
+	_device = (k8055_device*)malloc(sizeof(k8055_device));
 	if (_device == NULL) {
 		print_error("could not allocate memory for device");
 		return K8055_ERROR_MEM;
