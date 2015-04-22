@@ -1,6 +1,6 @@
-# k8055 for libusb-1.0 (specifically for Linux)
+# k8055 for libusb
 
-This library provides access to the Velleman K8055 USB Experiment Board for operating systems supporting libusb-1.0 (http://www.libusb.org/wiki/libusb-1.0), such as Linux. While providing a high-level interface to the user, the library communicates with a k8055 board through libusb.
+This library provides access to the Velleman K8055 USB Experiment Board. While providing a high-level interface to the user, the library communicates with a k8055 board through [libusb](http://www.libusb.org/wiki/libusb-1.0).
 
 ## Main Features
 - runs with libusb-1.0
@@ -14,35 +14,35 @@ This library provides access to the Velleman K8055 USB Experiment Board for oper
 
 ## Build
 ### Local build
-Run ```make local``` in the project root folder. Products are copied to 'target' directory.
+Run `make local` in the project root folder. Products are copied to 'target' directory.
 
-To remove all generated files, run ```make clean```.
+To remove all generated files, run `make clean`.
 
 ### System install
-Run  ```make install``` to install the library and header files (this command does essentially the same as a local build with the exception that products are copied to /usr/local/ by default). You may change that path by passing 'make' the variable 'PREFIX', i.e. ```make install PREFIX=/my/custom/path```. To uninstall, run ```make uninstall```.
+Run  `make install` to install the library and header files (this command does essentially the same as a local build with the exception that products are copied to /usr/local/ by default). You may change that path by passing 'make' the variable 'PREFIX', i.e. `make install PREFIX=/my/custom/path`. To uninstall, run `make uninstall`.
 
 ### Udev Rules
-If your system uses udev, you will probably have to configure it to allow access to the k8055 boards. The following instructions show how to configure udev (you will need root privileges).
+If your system uses udev (i.e. linux), you will probably have to configure it to allow access to the k8055 boards. The following instructions show how to configure udev.
 
 1. Copy the file `k8055.rules' into the udev rules directory, typically /etc/udev/rules.d
 
-    ```cp k8055.rules /etc/udev/rules.d/k8055.rules```
+    `cp k8055.rules /etc/udev/rules.d/k8055.rules`
 
 2. Create a group named k8055.
 
-    ```groupadd -r k8055```
+    `groupadd -r k8055`
 
 3. Add to the group yourself and/or other users whom you wish to grant access to the boards.
 
-    ```usermod -a -G k8055 $(USER)```
+    `usermod -a -G k8055 $(USER)`
 
-The previously described steps may be automated by running ```make install-rules``` to install just the rules or ```make install-permissions USERS="<list of users>"``` to also create the group and add the given list of users to it.
-To uninstall, run ```make uninstall-rules``` or ```make uninstall-permissions```.
+The previously described steps may be automated by running `make install-rules` to install just the rules or `make install-permissions USERS="<list of users>"` to also create the group and add the given list of users to it.
+To uninstall, run `make uninstall-rules` or `make uninstall-permissions`.
 
 ## Documentation
 See the comments in the source code for documentation about usage. Note: the API isn't the same as the one provided by Velleman in their DLL.
 
-Run ```make doc``` to generate doxygen documentation.
+Run `make doc` to generate doxygen documentation.
 
 ## Authors
 The library is written by Jakob Odersky. It is based on the information provided by the following people who wrote the original version of `libk8055' (http://libk8055.sourceforge.net) :
@@ -52,10 +52,8 @@ The library is written by Jakob Odersky. It is based on the information provided
 - 2007 by Pjetur G. Hjaltason <pjetur@pjetur.net> Commenting, general rearrangement of code, bugfixes, python interface with swig and simple k8055 python class
 
 
-## License
+## Copying
 Copyright (c) 2012 by Jakob Odersky
-
-All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
