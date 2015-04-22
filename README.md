@@ -8,6 +8,41 @@ This library provides access to the Velleman K8055 USB Experiment Board. While p
 - pseudo-querying of a board's output status (see header file documentation for detailed explanation)
 - concise and lightweight
 
+## Example Program 
+```c
+#include <stdio.h>
+#include <stdbool.h>
+#include <k8055.h>
+
+int main(int argc, char *argv[]) {
+    k8055_debug(true); //turn on debug information
+    k8055_device* device = NULL; //this will be a pointer to a K8055 board
+    
+    int r = k8055_open_device(0, &device); //open device on port 0
+    if (r != 0) return r; //return error code if something went wrong
+
+    k8055_set_digital(device, 0, true); //turn on digital output 0 (the first one)
+    k8055_set_analog(device, 0, 255); //turn on analog output 0 to maximum
+
+    int digital; //initialize variable containing digital input mask
+    int analog0; //initialize variable containing analog input 0
+    int analog1; //initialize variable containing analog input 1
+    int counter0; //initialize variable containing value of counter 0
+    int counter1; //initialize variable containing value of counter 1
+
+    //read current input
+    k8055_get_all_input(device, &digital, &analog0, &analog1, &counter0, &counter1, false);
+
+    //print input
+    printf("k8055 input status\n");
+    printf("digital bitmask: %d\nanalog 0: %d\nanalog 1: %d\ncounter 0: %d\ncounter 1: %d\n",
+        digital, analog0, analog1, counter0, counter1);
+
+    k8055_close_device(device); //close board and free resources
+    return 0;
+}
+```
+
 ## Requirements
 - libusb-1.0
 - (doxygen for documentation generation)
