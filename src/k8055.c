@@ -181,6 +181,8 @@ int k8055_open_device(int port, k8055_device** device) {
 	ssize_t size = libusb_get_device_list(context, &connected_devices); /* get all devices on system */
 	if (size <= 0) {
 		print_error("no usb devices found on system");
+		if (k8055_open_devices <= 0)
+			libusb_exit(context);
 		return K8055_ERROR_NO_DEVICES;
 	}
 
@@ -195,6 +197,9 @@ int k8055_open_device(int port, k8055_device** device) {
 	}
 	if (k8055 == NULL) {
 		print_error("velleman k8055 not found at port");
+		libusb_free_device_list(connected_devices, 1); // cleanup
+		if (k8055_open_devices <= 0)
+			libusb_exit(context);
 		return K8055_ERROR_NO_K8055;
 	}
 
